@@ -1,6 +1,6 @@
 import re
 
-# . 匹配(match)除了 \n 空字符串以外的字符
+# . 匹配(match)除了 \n 和 空字符串以外的字符
 
 anyend = '.end'
 
