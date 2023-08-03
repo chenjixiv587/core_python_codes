@@ -65,7 +65,70 @@ print(re.findall(r'(?:\w+\.)*(\w+\.com)',
 
 # ---------------------------------------
 # 使用名称标识符来表示对应的分组 而不是用 1 2 3 等等表示
+# (?P<name>)
+# (?P=name)
 
 print(re.search(
     r'\((?P<areacode>\d{3})\) (?P<prefix>\d{3})-(?:\d{4})', '(800) 222-1212').groupdict())
 # {'areacode': '800', 'prefix': '222'}
+
+
+print(re.sub(r'\((?P<areacode>\d{3})\) (?P<prefix>\d{3})-(?:\d{4})',
+             r'(\g<areacode>) \g<prefix>-xxxx', '(800) 222-1212'))
+# (800) 222-xxxx
+
+
+# ----------
+
+# (800) 123-1212
+print(bool(re.match(
+    r'\((?P<areacode>\d{3})\) (?P<prefix>\d{3})-(?P<number>\d{4}) (?P=areacode)-(?P=prefix)-(?P=number) 1(?P=areacode)(?P=prefix)(?P=number)',
+      '(800) 222-1212 800-222-1212 18002221212')))
+# True
+
+# 更优雅的方式
+print(bool(re.match(r'''(?x)
+         \((?P<areacode>\d{3})\)[ ](?P<prefix>\d{3})-(?P<number>\d{4})
+         [ ]
+         (?P=areacode)-(?P=prefix)-(?P=number)
+         [ ]
+         1(?P=areacode)(?P=prefix)(?P=number)
+''', '(800) 222-1212 800-222-1212 18002221212')))
+# True
+# ------------------------------------------------
+# (?=xxx) 正向前视断言 就是说只获取最靠近 xxx 的前面的直接的东西
+# (?!xxxx) 正向负视图断言 将 xxx 剔除
+print(re.findall(r'\w+(?= van Rossum)', '''
+          Guido van Rossum
+           Tim Peters
+           Alex Materlli
+           Just van Rossum
+           Raymond Hettinger      
+'''))
+# ['Guido', 'Just']
+
+print(re.findall(r'(?m)\s+(?!noreply|postmaster)(\w+)', '''
+           sales@jswodun.com
+           postmaster@jswodun.com
+           eng@phptr.com
+           noreply@phptr.com
+           admin@phptr.com   
+'''))
+# ['sales', 'eng', 'admin']
+
+
+print(['%s@bruce.com' % e.group(1) for e in
+       re.finditer(r'(?m)\s+(?!noreply|postmaster)(\w+)', '''
+           sales@jswodun.com
+           postmaster@jswodun.com
+           eng@phptr.com
+           noreply@phptr.com
+           admin@phptr.com   
+''')
+       ])
+# ['sales@bruce.com', 'eng@bruce.com', 'admin@bruce.com']
+
+
+# ---------条件判断
+print(bool(re.search(r'(?:(x)|y)((?(1)y|x))', 'xy')))
+#  True
